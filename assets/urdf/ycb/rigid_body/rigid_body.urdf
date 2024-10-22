@@ -5,14 +5,16 @@
       <origin xyz="0.0 0.0 0.0"/>
       <geometry>
         <!-- <mesh filename="ycb/025_mug/textured.obj" scale="1. 1. 1."/> -->
-        <mesh filename="ycb/rigid_body/p_mesh_c.obj" scale="1. 1. 1."/>
+        <!-- <mesh filename="ycb/rigid_body/red_mug.obj" scale="1. 1. 1."/> -->
+        <mesh filename="ycb/rigid_body/table_top.obj" scale="1. 1. 1."/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="0.0 0.0 0.0"/>
       <geometry>
         <!-- <mesh filename="ycb/025_mug/mug_collision.obj" scale="1. 1. 1."/>-->
-        <mesh filename="ycb/rigid_body/p_mesh_c.obj" scale="1. 1. 1."/>
+        <!-- <mesh filename="ycb/rigid_body/red_mug.obj" scale="1. 1. 1."/> -->
+        <mesh filename="ycb/rigid_body/table_top.obj" scale="1. 1. 1."/>        
       </geometry>
     </collision>
     <inertial>

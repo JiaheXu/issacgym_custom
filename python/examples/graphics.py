@@ -185,16 +185,16 @@ for i in range(num_envs):
 
 # Assign textures to each actor by assigning a different texture to each rigid body within each actor. With
 # only balls, each actor has only one rigit body
-textures_applied = 0
-for i in range(num_envs):
-    actor_count = gym.get_actor_count(envs[i])
-    for j in range(actor_count):
-        actor_handle = gym.get_actor_handle(envs[i], j)
-        num_bodies = gym.get_actor_rigid_body_count(envs[i], actor_handle)
-        for b in range(num_bodies):
-            texture_index = np.mod(textures_applied, len(texture_handles))
-            gym.set_rigid_body_texture(envs[i], actor_handle, b, gymapi.MESH_VISUAL_AND_COLLISION, texture_handles[texture_index])
-            textures_applied = textures_applied + 1
+# textures_applied = 0
+# for i in range(num_envs):
+#     actor_count = gym.get_actor_count(envs[i])
+#     for j in range(actor_count):
+#         actor_handle = gym.get_actor_handle(envs[i], j)
+#         num_bodies = gym.get_actor_rigid_body_count(envs[i], actor_handle)
+#         for b in range(num_bodies):
+#             texture_index = np.mod(textures_applied, len(texture_handles))
+#             gym.set_rigid_body_texture(envs[i], actor_handle, b, gymapi.MESH_VISUAL_AND_COLLISION, texture_handles[texture_index])
+#             textures_applied = textures_applied + 1
 
 
 if not os.path.exists("graphics_images"):
