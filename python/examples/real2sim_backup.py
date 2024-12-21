@@ -63,12 +63,7 @@ viewer = gym.create_viewer(sim, gymapi.CameraProperties())
 if viewer is None:
     raise ValueError('*** Failed to create viewer')
 
-# add ground plane
-# plane_params = gymapi.PlaneParams()
-# plane_params.static_friction = 0.0
-# plane_params.dynamic_friction = 0.0
 
-# gym.add_ground(sim, plane_params)
 
 # set up the env grid
 num_envs = 1
@@ -81,54 +76,72 @@ envs = []
 table_handles = []
 actor_handles = []
 
-# create ball asset with gravity disabled
+# create table asset with gravity disabled
 asset_root = "../../assets"
 asset_file = "urdf/ycb/table_top/table_top.urdf"
-# asset_file = "urdf/ycb/red_cube/red_cube.urdf"
 asset_options = gymapi.AssetOptions()
 asset_options.fix_base_link = True
-# asset_options.disable_gravity = True
 print("Loading asset '%s' from '%s'" % (asset_file, asset_root))
-asset_table = gym.load_asset(sim, asset_root, asset_file, asset_options)
+# asset_table = gym.load_asset(sim, asset_root, asset_file, asset_options)
 
+# create static box asset
+asset_options.fix_base_link = True
+asset_box = gym.create_box(sim, 1.0, 1.0, 0.03, asset_options)
 
 
 # load ball asset
-# asset_root = "../../assets"
-# asset_file_ball = "urdf/ycb/red_cube/red_cube.urdf"
-# asset_ball = gym.load_asset(sim, asset_root, asset_file_ball, gymapi.AssetOptions())
+asset_root = "../../assets"
+# asset_file_object = "urdf/ycb/red_cube/red_cube.urdf"
+asset_file_object = "urdf/ycb/red_mug/red_mug.urdf"
+
+asset_object = gym.load_asset(sim, asset_root, asset_file_object, gymapi.AssetOptions())
 
 
 color = gymapi.Vec3(0, 1, 0)
 pose = gymapi.Transform()
 pose.r = gymapi.Quat(0, 0, 0, 1)
 
+
+# mesh scale:  16.103548483729227
+# transform:  [[   0.97441594    0.22451232    0.01038267  452.03628145]
+#  [  -0.22332016    0.96196666    0.15731573 -290.96597253]
+#  [   0.02533154   -0.15560962    0.98749378 -461.58481256]
+#  [   0.            0.            0.            1.        ]]
+
+object_scale = 1. # / 161.03548483729227
 print('Creating %d environments' % num_envs)
 for i in range(num_envs):
     # create env
     env = gym.create_env(sim, env_lower, env_upper, 1)
     envs.append(env)
 
+    # add table actor
+    # pose = gymapi.Transform()
+    # pose.p = gymapi.Vec3(0.0, 0.0, 0.0)
+    # pose.r = gymapi.Quat(0, 0, 0, 1)
+    # table_handle = gym.create_actor(env, asset_table, pose, "table_top", i, 0)
+    # actor_handles.append(table_handle)
+
     # add box actor
     pose = gymapi.Transform()
     pose.p = gymapi.Vec3(0.0, 0.0, 0.0)
     pose.r = gymapi.Quat(0, 0, 0, 1)
-    table_handle = gym.create_actor(env, asset_table, pose, "table_top", i, 0)
+    table_handle = gym.create_actor(env, asset_box, pose, "table_top", i, 0)
     actor_handles.append(table_handle)
-
-    # set restitution for box actor
-    # shape_props = gym.get_actor_rigid_shape_properties(env, table_handle)
-    # shape_props[0].restitution = 1
-    # shape_props[0].compliance = 0.5
-    # gym.set_actor_rigid_shape_properties(env, table_handle, shape_props)
-
+    shape_props = gym.get_actor_rigid_shape_properties(env, table_handle)
+    shape_props[0].restitution = 1
+    shape_props[0].compliance = 0.5
+    gym.set_actor_rigid_shape_properties(env, table_handle, shape_props)
 
     # mug
-    # pose.p = gymapi.Vec3(0.1, -0.1, 0.05)
-    # collision_group = 0
-    # collision_filter = 0
-    # ahandle = gym.create_actor(env, asset_ball, pose, None, collision_group, collision_filter)
-    # gym.set_rigid_body_color(env, ahandle, 0, gymapi.MESH_VISUAL_AND_COLLISION, color)
+    pose.p = gymapi.Vec3(0., 0.0, 0.15)
+    object_handle = gym.create_actor(env, asset_object, pose, "object", i, 0)
+    actor_handles.append(object_handle)
+    shape_props = gym.get_actor_rigid_shape_properties(env, object_handle)
+    shape_props[0].restitution = 1
+    shape_props[0].compliance = 0.5
+    gym.set_actor_rigid_shape_properties(env, object_handle, shape_props)
+    gym.set_actor_scale(env, object_handle, object_scale)
 
 def compute_camera_intrinsics_matrix(image_width, image_heigth, horizontal_fov, device):
     vertical_fov = (image_heigth / image_width * horizontal_fov) * np.pi / 180
