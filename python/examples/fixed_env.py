@@ -83,8 +83,8 @@ actor_handles = []
 
 # create ball asset with gravity disabled
 asset_root = "../../assets"
-asset_file = "urdf/ycb/table_top/table_top.urdf"
-# asset_file = "urdf/ycb/red_cube/red_cube.urdf"
+# asset_file = "urdf/ycb/table_top/table_top.urdf"
+asset_file = "urdf/ycb/red_cube/red_cube.urdf"
 asset_options = gymapi.AssetOptions()
 asset_options.fix_base_link = True
 # asset_options.disable_gravity = True

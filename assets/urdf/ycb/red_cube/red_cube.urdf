@@ -6,7 +6,7 @@
       <geometry>
         <!-- <mesh filename="ycb/025_mug/textured.obj" scale="1. 1. 1."/> -->
         <!-- <mesh filename="ycb/rigid_body/red_mug.obj" scale="1. 1. 1."/> -->
-        <mesh filename="ycb/red_cube/base.obj" scale="0.01 0.01 0.01"/>
+        <mesh filename="ycb/red_cube/base.obj" scale="1. 1. 1."/>
       </geometry>
     </visual>
     <collision>
@@ -14,12 +14,12 @@
       <geometry>
         <!-- <mesh filename="ycb/025_mug/mug_collision.obj" scale="1. 1. 1."/>-->
         <!-- <mesh filename="ycb/rigid_body/red_mug.obj" scale="1. 1. 1."/> -->
-        <mesh filename="ycb/red_cube/base.obj" scale="0.01 0.01 0.01"/>        
+        <mesh filename="ycb/red_cube/base.obj" scale="1. 1. 1."/>        
       </geometry>
     </collision>
     <inertial>
-      <mass value="0.026"/>
-      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+      <mass value="0.2"/>
+      <inertia ixx="0.0000" ixy="0.0" ixz="0.0" iyy="0.000" iyz="0.0" izz="0.000"/>
     </inertial>
   </link>
 </robot>

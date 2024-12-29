@@ -192,7 +192,7 @@ for i in range(num_envs):
                 for b in range(len(body_props)):
                     body_props[b].flags = gymapi.RIGID_BODY_NONE
                 gym.set_actor_rigid_body_properties(env, ball_handle, body_props)
-
+            actor_handles.append(ball_handle)
             # set ball color
             color = gymapi.Vec3(color_vec[0], color_vec[1], color_vec[2])
             gym.set_rigid_body_color(env, ball_handle, 0, gymapi.MESH_VISUAL_AND_COLLISION, color)
@@ -205,7 +205,19 @@ cam_pos = gymapi.Vec3(6, 4.5, 3)
 cam_target = gymapi.Vec3(-0.8, 0.5, 0)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
+time_idx = 0
+
 while not gym.query_viewer_has_closed(viewer):
+
+    time_idx += 1
+    if(time_idx >= 100):
+        # add moving boxes to env
+        # for dx in range(3):
+        print("???")
+        # apply linear velocity
+        gym.set_rigid_linear_velocity(envs[0],
+                                        gym.get_rigid_handle(envs[0], name, gym.get_actor_rigid_body_names(envs[0], actor_handles[0])[0]),
+                                        gymapi.Vec3(0., 2., 0.))
 
     # step the physics
     gym.simulate(sim)
