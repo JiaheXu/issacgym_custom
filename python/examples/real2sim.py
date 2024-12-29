@@ -24,7 +24,15 @@ import torch
 import random
 import time
 
+import PIL.Image as PIL_Image
 
+def save_np_image(img_np, file_name = "test.jpg"):
+    max_val = np.max(img_np)
+    if(max_val < 2.0 ):
+        img_np = img_np*255.0
+    image_np = (img_np).astype(np.uint8)
+    im = PIL_Image.fromarray(image_np)        
+    im = im.save(file_name)
 
 
 def compute_camera_peoperty(image_width, image_height, intrinsic):
@@ -149,6 +157,7 @@ box_pose = gymapi.Transform()
 
 passive_obj_pose = gymapi.Transform()
 
+env = None
 envs = []
 box_idxs = []
 passive_obj_idxs = []
@@ -215,12 +224,15 @@ for i in range(num_envs):
     # get global index of box in rigid body state tensor
     box_idx = gym.get_actor_rigid_body_index(env, box_handle, 0, gymapi.DOMAIN_SIM)
     box_idxs.append(box_idx)
+    gym.set_rigid_body_segmentation_id(env, box_handle, 0, 1)
 
     passive_obj_handle = gym.create_actor(env, object_asset, passive_obj_pose, "box2", i, 0)
     gym.set_actor_scale(env, passive_obj_handle, object_scale)
     # get global index of box in rigid body state tensor
     passive_obj_idx = gym.get_actor_rigid_body_index(env, passive_obj_handle, 0, gymapi.DOMAIN_SIM)
     passive_obj_idxs.append(passive_obj_idx)
+
+    gym.set_rigid_body_segmentation_id(env, passive_obj_handle, 0, 2)
 
 
 # point camera at middle env
@@ -269,8 +281,24 @@ traj_pose.r.y = -0.00559756
 traj_pose.r.z = -0.01357897
 traj_pose.r.w =   0.99956865
 # simulation loop
-while not gym.query_viewer_has_closed(viewer):
 
+camera_handles = [[]]
+for i in range(num_envs):
+    camera_handles.append([])
+    
+    camera_properties = compute_camera_peoperty(img_size, img_size, resized_intrinsic_np)
+
+    # Set a fixed position and look-target for the first camera
+    # position and target location are in the coordinate frame of the environment
+    h1 = gym.create_camera_sensor(envs[i], camera_properties)
+    camera_position = gymapi.Vec3(-0.13913296, 0.053, 0.43643044)
+    camera_target = gymapi.Vec3(0.62799622, 0.00756501, -0.2034511)
+    gym.set_camera_location(h1, envs[i], camera_position, camera_target)
+    camera_handles[i].append(h1)
+
+while not gym.query_viewer_has_closed(viewer):
+    if(time_idx > 40):
+        break
 
     time_idx += 1
     if(time_idx >= 30 and time_idx <=40 ):
@@ -284,6 +312,16 @@ while not gym.query_viewer_has_closed(viewer):
             ),                    
             traj_pose
         )
+
+        # rgb_filename = "rgb_env%d_cam0_frame%d.png" % (0, time_idx)
+        # gym.write_camera_image_to_file(sim, envs[0], camera_handles[0][0], gymapi.IMAGE_COLOR, rgb_filename)
+
+
+
+
+        # print("rgb: ", rgb.shape)
+        # print("max: ", np.max(rgb))
+        # save_np_image(rgb, file_name = "test.jpg")
         # gym.set_rigid_linear_velocity(
         #     envs[0],
         #     gym.get_rigid_handle(
@@ -307,7 +345,31 @@ while not gym.query_viewer_has_closed(viewer):
     # update viewer
     gym.step_graphics(sim)
     gym.draw_viewer(viewer, sim, False)
+    # render the camera sensors
+    gym.render_all_camera_sensors(sim)
+
     gym.sync_frame_time(sim)
+
+    if(time_idx >= 30 and time_idx <=40 ):
+
+        rgb_filename = "rgb_env%d_cam0_frame%d.png" % (0, time_idx)
+        gym.write_camera_image_to_file(sim, envs[0], camera_handles[0][0], gymapi.IMAGE_COLOR, rgb_filename)
+
+        segmentation = gym.get_camera_image(
+            sim, envs[0], camera_handles[0][0], gymapi.IMAGE_SEGMENTATION,
+        )
+        print("seg: ", segmentation.shape)
+        print("idx: ", np.max(segmentation))
+
+        # depth = gym.get_camera_image(
+        #     sim, envs[0], camera_handles[0][0], gymapi.IMAGE_DEPTH,
+        # )
+        # print("depth: ", depth.shape)
+        # print("max: ", np.max(depth))
+        # rgba = gym.get_camera_image(
+        #     sim, envs[0], camera_handles[0][0], gymapi.IMAGE_COLOR,
+        # ).reshape(512, 512, 4)
+        # rgb = rgba[:,:,0:3]
 
 # cleanup
 gym.destroy_viewer(viewer)
