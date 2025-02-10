@@ -203,8 +203,6 @@ gym.viewer_camera_look_at(viewer, middle_env, cam_pos, cam_target)
 # from now on, we will use the tensor API that can run on CPU or GPU
 gym.prepare_sim(sim)
 
-
-
 time_idx = 0
 traj = []
 traj_pose = gymapi.Transform()
@@ -247,7 +245,7 @@ while not gym.query_viewer_has_closed(viewer):
             envs[0],
             gym.get_rigid_handle(
                 envs[0], 
-                "box", 
+                "obj1", 
                 gym.get_actor_rigid_body_names(envs[0], obj1_handle)[0] 
             ),                    
             traj_pose
