@@ -119,8 +119,8 @@ passive_obj_pose = gymapi.Transform()
 
 env = None
 envs = []
-box_idxs = []
-passive_obj_idxs = []
+obj0_idxs = []
+obj1_idxs = []
 
 hand_idxs = []
 init_pos_list = []
@@ -177,7 +177,7 @@ for i in range(num_envs):
     gym.set_actor_scale(env, obj1_handle, obj1_scale)
     # get global index of box in rigid body state tensor
     obj1_idx = gym.get_actor_rigid_body_index(env, obj1_handle, 0, gymapi.DOMAIN_SIM)
-    obj1_idxs.append(obj_idx)
+    obj1_idxs.append(obj1_idx)
     gym.set_rigid_body_segmentation_id(env, obj1_handle, 0, 2)
 
 
